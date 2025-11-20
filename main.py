@@ -3,13 +3,11 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 import json
 import os
 
-
-
 # Bot tokeningizni kiriting
-BOT_TOKEN = "8481332586:AAFOkMGLts3E4enV6VhNNuT1HDzIVkfY32I"
+BOT_TOKEN = "8531222565:AAEQzA4sZ3Q6qDtjan2phdxMHkVfXU1qaco"
 
 # Admin ID (o'z telegram ID ingizni kiriting)
-ADMIN_ID = 7863358816  # O'z ID ingizni kiriting
+ADMIN_ID = 7877174037  # O'z ID ingizni kiriting
 
 # Kinolar ma'lumotlari uchun fayl
 MOVIES_FILE = "movies.json"
@@ -116,7 +114,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     total_users = len(users_db)
     
-    if user_id == 7863358816:
+    if user_id == ADMIN_ID:
         # Admin uchun
         welcome_text = f"""
 👋 Salom Admin {user.first_name}!
@@ -222,7 +220,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "📝 Kino bot yasash":
         await update.message.reply_text(
             "📝 Kino bot yasash uchun menga lichkamga yozing:\n\n"
-            f"👉 @serif_12\n\n"
+            f"👉 @Javookhr\n\n"
             "Yoki pastdagi tugmani bosing:",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("✉️ Admin bilan bog'lanish", url=f"tg://user?id={ADMIN_ID}")
@@ -485,7 +483,7 @@ async def search_by_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
             movie = movies_db[movie_code]
             await update.message.reply_video(
                 video=movie['file_id'],
-                caption=f"✅ Kino topildi!\n\n{movie['info']}\n\n📝 Kod: {movie_code}\n\n@kurakinos_bot Orqali kino topildi"
+                caption=f"✅ Kino topildi!\n\n{movie['info']}\n\n📝 Kod: {movie_code}\n\n@YourBotUsername orqali"
             )
         else:
             await update.message.reply_text(
@@ -633,10 +631,9 @@ async def broadcast_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=admin_keyboard()
     )
 
-# Asosiy funksiya
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
-    
+
     # Handlerlar
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("cancel", cancel))
@@ -646,11 +643,23 @@ def main():
     app.add_handler(MessageHandler(filters.PHOTO, handle_admin_input))
     app.add_handler(MessageHandler(filters.AUDIO | filters.VOICE, handle_admin_input))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_buttons))
-    
-    print("🤖 Bot ishga tushdi!")
-    print(f"📊 Bazada {len(movies_db)} ta kino mavjud")
-    print(f"📢 {len(channels_list)} ta majburiy kanal")
-    app.run_polling()
 
-if __name__ == '__main__':
+    print("🔥 Bot WEBHOOK orqali ishga tushdi!")
+    print(f"🎬 Bazada {len(movies_db)} ta kino mavjud")
+    print(f"📢 {len(channels_list)} ta majburiy kanal")
+
+    # Railway PORT (majburiy)
+    PORT = int(os.environ.get("PORT", 8080))
+
+    # SENING WEBHOOK URL'ingni shu yerga qo'yasan!
+    WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE"
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=WEBHOOK_URL
+    )
+
+
+if name == "__main__":
     main()
